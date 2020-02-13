@@ -1,0 +1,60 @@
+---
+
+- name: "Include OS-specific variables."
+  include_vars: "{{ item }}"
+  tags: [ "vagrant", "variables" ]
+  with_first_found:
+    - files:
+        - "vars/{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version }}.yml"
+        - "vars/{{ ansible_os_family | lower }}.yml"
+      skip: true
+
+- name: "Define install_packages."
+  when: vagrant_role_install_packages is not defined
+  set_fact:
+    vagrant_role_install_packages: "{{ vagrant_role.install_packages | list }}"
+
+- name: "Define vagrant_daemon."
+  set_fact:
+    vagrant_daemon: "{{ vagrant_role.install_daemon }}"
+  when: vagrant_daemon is not defined
+
+#- name: "Define slow_query_log_file."
+#  set_fact:
+#    slow_query_log_file: "{{ slow_query_log_file }}"
+#  when: slow_query_log_file is not defined
+
+- name: "Define vagrant_log_error."
+  set_fact:
+    vagrant_log_error: "{{ vagrant_role.log.error }}"
+  when: vagrant_log_error is not defined
+
+- name: "Define Vagrant syslog tag"
+  set_fact:
+    vagrant_syslog_tag: "{{ vagrant_role.syslog_tag }}"
+  when: vagrant_syslog_tag is not defined
+
+- name: "Define PID file."
+  set_fact:
+    vagrant_role_pidfile: "{{ vagrant_role.pidfile }}"
+  when: vagrant_role_pidfile is not defined
+
+- name: "Define vagrant_config_file."
+  set_fact:
+    vagrant_role_config_file: "{{ vagrant_role.config_file }}"
+  when: vagrant_role_config_file is not defined
+
+#- name: Define vagrant_config_include_dir.
+#  set_fact:
+#    config_include_dir: "{{ vagrant_config_include_dir }}"
+#  when: config_include_dir is not defined
+#
+#- name: Define transient_socket.
+#  set_fact:
+#    vagrant_socket: "{{ __mysql_socket }}"
+#  when: mysql_socket is not defined
+#
+#- name: Define mysql_supports_innodb_large_prefix.
+#  set_fact:
+#    mysql_supports_innodb_large_prefix: "{{ __mysql_supports_innodb_large_prefix }}"
+#  when: mysql_supports_innodb_large_prefix is not defined

@@ -1,0 +1,133 @@
+---
+
+- name: "Prepare for service update"
+  tags: [ "vagrant", "prepare" ]
+  include_tasks: prepare.yml
+
+- name: "Variable configuration."
+  tags: [ "vagrant", "variables" ]
+  include_tasks: variables.yml
+
+# Build
+
+- name: "Uninstall Vagrant"
+  tags: [ "vagrant", "uninstall" ]
+  include_tasks: uninstall.yml
+  when: state|default('present') == "absent"
+
+- name: "Install Vagrant"
+  tags: [ "vagrant", "install" , "redhat"]
+  include_tasks: "{{ item }}"
+  when: state|default("present") == "present"
+  with_first_found:
+    - files:
+        - "install-{{ ansible_distribution | lower }}_{{ ansible_distribution_version }}.yml"
+        - "install-{{ ansible_distribution | lower }}_{{ ansible_distribution_major_version }}.yml"
+        - "install-{{ ansible_distribution | lower }}.yml"
+        - "install-{{ ansible_os_family | lower }}.yml"
+      skip: true
+##  rescue:
+##    - debug: msg='I caught an error'
+##  always:
+#- name: "Check if Vagrant packages were installed"
+#  tags: [ "vagrant", "install" ]
+#  set_fact:
+#    install_packages: "{{
+#      (rhel.install_packages is defined and rhel.install_packages.changed)
+#      or (debian.install_packages is defined and debian.install_packages.changed)
+#      or (archlinux.install_packages is defined and archlinux.install_packages.changed)
+#    }}"
+
+#
+- name: "Installing Linux packages"
+  become: yes
+  tags: [ "vagrant", "install" ]
+  when: state|default('present') == "present"
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ vagrant_role_install_packages }}"
+
+- name: "Installing Vagrant packages"
+  become: yes
+  tags: [ "vagrant", "install" ]
+  when: state|default('present') == "present"
+  package:
+    name: vagrant
+    state: present
+
+#- name: "Installing Python modules"
+#  tags: [ "vagrant", "install", "python" ]
+#  when: state|default('present') == "present"
+#  pip:
+#    name: "{{ item }}"
+#    state: present
+#  with_items: "{{ vagrant_role_python_modules }}"
+
+#- name: "Create users"
+#  include_tasks: users.yml
+#  when: state|default('present') == "present"
+#  tags: [ "vagrant", "{{ ansible_os_family | lower }}", "users" ]
+#
+#- name: "Configure Vagrant"
+#  include_tasks: configure.yml
+#  when: state|default('present') == "present"
+#  tags: [ "vagrant", "{{ ansible_os_family | lower }}", "configure" ]
+#
+#
+
+- name: "Install gems"
+  become: yes
+  gem:
+    name: nokogiri
+    state: present
+
+- name: "Installing Vagrant plugins for Vagrant"
+  include_tasks: setup-plugins.yml
+  when: state|default('present') == "present"
+  tags: [ "vagrant", "install", "plugins" ]
+
+
+- name: "Install Vagrant boxes"
+  command: "vagrant box add {{ vagrant_box }} --provider=libvirt"
+  with_items: "{{ vagrant_role_vagrant_boxes }}"
+  loop_control:
+    loop_var: vagrant_box
+#
+#
+#- name: "Load vhost kernel module"
+#  when: state|default('present') == "present"
+#  tags: [ "vagrant" ]
+#  become: yes
+#  modprobe:
+#    name: vhost_net
+#    state: present
+#
+#- name: "Ensure ntpd is up-to-date."
+#  when: state|default('present') == "present"
+#  tags: [ "vagrant" ]
+#  package:
+#    name: ntp
+#    state: present
+#  notify:
+#    - ntpd
+#
+#- name: "Install Vagrant"
+#  when: state|default('present') == "present"
+#  tags: [ "vagrant" ]
+#  package:
+#    name: vagrant
+#    state: present
+#  notify:
+#    - vagrant
+#
+#- name: "Create a directory if it does not exist"
+#  when: state|default('present') == "present"
+#  tags: [ "vagrant" ]
+#  file:
+#    path: boxes
+#    state: directory
+#    mode: '0755'
+#
+#- name: "Start Vagrant"
+#  command: vagrant up

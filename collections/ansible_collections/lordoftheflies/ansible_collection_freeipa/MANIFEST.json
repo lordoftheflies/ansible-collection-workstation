@@ -1,0 +1,38 @@
+{
+ "collection_info": {
+  "namespace": "lordoftheflies",
+  "name": "ansible_collection_freeipa",
+  "version": "0.0.1",
+  "authors": [
+   "Thomas Woerner <twoerner@redhat.com>",
+   "L\u00e1szl\u00f3 Heged\u0171s <laszlo.hegedus@cherubits.hu>"
+  ],
+  "readme": "README.md",
+  "tags": [
+   "cherubits",
+   "identity",
+   "ipa",
+   "freeipa",
+   "cluster",
+   "collection"
+  ],
+  "description": "Collection of roles which needed for internal-policy-audit.",
+  "license": [
+   "GPL-3.0-or-later"
+  ],
+  "license_file": "COPYING",
+  "dependencies": null,
+  "repository": "https://github.com/lordoftheflies/ansible-collection-freeipa",
+  "documentation": "https://github.com/lordoftheflies/ansible-collection-freeipa/blob/master/README.md",
+  "homepage": "https://github.com/lordoftheflies/ansible-collection-freeipa",
+  "issues": "https://github.com/lordoftheflies/ansible-collection-freeipa/issues"
+ },
+ "file_manifest_file": {
+  "name": "FILES.json",
+  "ftype": "file",
+  "chksum_type": "sha256",
+  "chksum_sha256": "e8e7d1d7652b14b3887e629b687203ef41f5b563aadc743dec93a60f87d9a76f",
+  "format": 1
+ },
+ "format": 1
+}

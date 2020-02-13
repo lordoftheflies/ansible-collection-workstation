@@ -21,7 +21,6 @@ authors:
 
 ### OPTIONAL but strongly recommended
 
-# A short summary description of the collection
 description: Ansible Galaxy collection for workstations.
 
 # Either a single license or a list of licenses for content inside of a collection. Ansible Galaxy currently only
@@ -35,7 +34,7 @@ license_file: ''
 
 # A list of tags you want to associate with the collection for indexing/searching. A tag name has the same character
 # requirements as 'namespace' and 'name'
-tags: ['cherubits', 'workstation']
+tags: ['cherubits', 'workstation', 'collection']
 
 # Collections that this collection requires to be installed for it to be usable. The key of the dict is the
 # collection label 'namespace.name'. The value is a version range
@@ -44,13 +43,13 @@ tags: ['cherubits', 'workstation']
 dependencies: {}
 
 # The URL of the originating SCM repository
-repository: http://example.com/repository
+repository: https://github.com/lordoftheflies/ansible-collection-workstation.git
 
 # The URL to any online docs
-documentation: http://docs.example.com
+documentation: https://lordoftheflies.github.io/ansible-collection-workstation
 
 # The URL to the homepage of the collection/project
-homepage: http://example.com
+homepage: https://github.com/lordoftheflies/ansible-collection-workstation
 
 # The URL to the collection issue tracker
-issues: http://example.com/issue/tracker
+issues: https://github.com/lordoftheflies/ansible-collection-workstation/issues
