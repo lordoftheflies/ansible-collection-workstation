@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  vars:
+    - ansible_role_nodejs_deployment_users_home: /root
+    - ansible_role_nodejs_testing_provider: lxd
+  roles:
+    - ansible_role_nodejs

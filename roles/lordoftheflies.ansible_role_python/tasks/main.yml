@@ -1,0 +1,131 @@
+---
+
+
+
+# START - boilerplate tasks
+
+- name: Load OS specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ fact_role_path }}/vars/{{ ansible_os_family | lower }}.yml"
+      skip: true
+
+- name: "Run any OS specific tasks"
+  include: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ fact_role_path }}/tasks/{{ ansible_os_family | lower }}.yml"
+      skip: true
+
+- name: "Load distribution (centos, ubuntu) default variables"
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ fact_role_path }}/defaults/{{ ansible_distribution | lower }}.yml"
+      skip: true
+
+- name: "DEBUG - Debug ansible_role_python variable values"
+  include: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ fact_role_path }}/tasks/debug.yml"
+      skip: true
+  when: ansible_role_python_debug is defined and ansible_role_python_debug
+
+# END - boilerplate tasks
+
+# OS Versions
+
+## DEBUGGING
+
+- name: "DEBUG - value of ansible_distribution"
+  debug: var=ansible_distribution
+  when: ansible_role_python_debug
+
+- name: "DEBUG - value of ansible_distribution_version"
+  debug: var=ansible_distribution_version
+  when: ansible_role_python_debug
+
+- name: "DEBUG - value of ansible_distribution_major_version"
+  debug: var=ansible_distribution_major_version
+  when: ansible_role_python_debug
+
+## CentOS
+
+- name: "Run CentOS  specific tasks"
+  include_tasks: "centos_{{ distribution }}.yml"
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version| int == ""
+  with_items:
+    - 7
+    - 8
+    - 9
+  loop_control:
+    loop_var: distribution
+
+## Debian
+
+- name: "Run Debian  (Stretch) specific tasks"
+  include_tasks: "debian_{{ distribution }}.yml"
+  when: ansible_distribution == 'Debian' and ansible_distribution_major_version| int == ""
+  with_items:
+    - 7
+    - 8
+    - 9
+  loop_control:
+    loop_var: distribution
+## Ubuntu
+
+- name: "Run Ubuntu  specific tasks"
+  include_tasks: "ubuntu_{{ distribution }}.yml"
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == ""
+  with_items:
+      - 12.04
+      - 14.04
+      - 16.04
+      - 17.04
+      - 18.04
+      - 19.04
+  loop_control:
+    loop_var: distribution
+
+- name: "Install necessary packages"
+  become: yes
+  package:
+    name: "{{ necessary_package }}"
+    state: present
+  with_items:
+      - python3-pip
+      - libssl-dev
+      - virtualenv
+  loop_control:
+    loop_var: necessary_package
+
+- name: "Install runtime packages"
+  become: yes
+  package:
+    name: "python{{python_runtime_version}}"
+    state: present
+
+- name: "Link python to Python {{ python_runtime_version }}"
+  become: yes
+  file:
+    src: "/usr/bin/python{{ python_runtime_version }}"
+    dest: /usr/bin/python
+    state: link
+
+- name: "Link python3 to Python {{ python_runtime_version }}"
+  become: yes
+  file:
+    src: "/usr/bin/python{{ python_runtime_version }}"
+    dest: /usr/bin/python3
+    state: link
+
+
+- name: "Link pip to Pip 3 {{ python_runtime_version }}"
+  become: yes
+  file:
+    src: /usr/bin/pip3
+    dest: /usr/bin/pip
+    state: link
+  ignore_errors: yes

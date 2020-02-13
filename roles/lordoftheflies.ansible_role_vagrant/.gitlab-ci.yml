@@ -1,0 +1,69 @@
+---
+stages:
+  - prepare
+  - lint
+  - test
+  - secure
+
+prepare:
+  stage: prepare
+
+  before_script:
+    - apt install python-pip3
+  script:
+    - pip install ansible
+  after_script:
+    - ansible --version
+
+test:
+  stage: test
+  variables:
+    node_app_dir: /var/local/my_node_app
+  environment:
+    NVM_DIR: /var/local/nvm
+    PATH: /var/local/nvm/versions/node/v4.2.1/bin:{{ ansible_env.PATH }}
+  script:
+    - ansible-playbook tests/test.yml -i tests/e2e.ini --syntax-check
+
+ansible_linting:
+  variables:
+    GIT_SSL_NO_VERIFY: "True"
+  stage: lint
+  script:
+    - ansible-lint *.yml
+
+ansible-syntax:
+  stage: validate
+  tags:
+    - docker
+  image:
+    name: registry.cherubits.hu/hispanico/docker-terraform-ansible:latest
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+  script:
+    - ansible-galaxy install -r tests/requirements.yml
+    - ln -s $CI_PROJECT_DIR ~/.ansible/roles/role_under_test
+    - ansible-playbook tests/test.yml --syntax-check
+
+ansible-lint:
+  stage: validate
+
+  tags:
+    - docker
+  image:
+    name: registry.gitlab.com/hispanico/docker-terraform-ansible:latest
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+  script:
+    - ln -s $CI_PROJECT_DIR ~/.ansible/roles/ansible_role_vagrant
+    - ansible-lint tests/test.yml
+  allow_failure: true
+
+encrypt:
+  stage: secure
+  before_script:
+    - ansible-vault create --verbose --ask-vault-pass .ansible.vlt
+  script:
+    - ansible-vault encrypt_string --ask-vault-pass --vault-id dev@.ansible.vlt --name ''

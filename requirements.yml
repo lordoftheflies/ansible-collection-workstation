@@ -10,11 +10,12 @@ roles:
     source: https://galaxy.ansible.com
 
 collections:
-  - name: lordoftheflies.basic_roles
+#  - name: lordoftheflies.basic_roles
+#    source: https://galaxy.ansible.com
+  - name: lordoftheflies.ansible_collection_freeipa
+    version: '*'
     source: https://galaxy.ansible.com
-  - name: freeipa.ansible_freeipa
-    source: https://galaxy.ansible.com
-  - name: lordoftheflies.sdlc_roles
-    source: https://galaxy.ansible.com
-  - name: lordoftheflies.soho_roles
-    source: https://galaxy.ansible.com
+#  - name: lordoftheflies.sdlc_roles
+#    source: https://galaxy.ansible.com
+#  - name: lordoftheflies.soho_roles
+#    source: https://galaxy.ansible.com
